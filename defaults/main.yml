@@ -8,7 +8,7 @@ semaphore_mysql_create_db: true
 
 # database options
 semaphore_mysql_host: "127.0.0.1"
-semaphore_mysql_port: "3000"
+semaphore_mysql_port: "3306"
 semaphore_mysql_db: "semaphore"
 semaphore_mysql_user: "semaphore"
 semaphore_mysql_password: "semaphore"
