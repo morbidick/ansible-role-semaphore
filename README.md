@@ -44,10 +44,16 @@ For all options see [defaults/main.yml](defaults/main.yml)
 
 ## Demo/Development
 
-You can use the [Vagrantfile](Vagrantfile) for local testing, just install vagrant and virtualbox, execute the following commands. Open your browser at [127.0.0.1:5000](http://127.0.0.1:5000) and login with user and password `admin`.
+You can use the [Vagrantfile](Vagrantfile) for local testing, just install vagrant and virtualbox.
+
+* run `vagrant up`
+* open your browser at [127.0.0.1:5000](http://127.0.0.1:5000)
+* and login with user and password `admin`.
 
 ````bash
+# boot the vm
 vagrant up
+# reprovision
 vagrant provision
 ````
 
