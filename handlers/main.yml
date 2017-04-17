@@ -1,0 +1,6 @@
+---
+- name: semaphore restart
+  service:
+    name: "{{ semaphore_identifier }}"
+    daemon_reload: true
+    state: restarted

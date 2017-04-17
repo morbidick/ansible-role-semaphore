@@ -1,0 +1,116 @@
+---
+- include: setup-mysql.yml
+  when: semaphore_mysql_install or semaphore_mysql_create_db
+
+- name: add ansible ppa
+  apt_repository:
+    repo: 'ppa:ansible/ansible'
+
+- name: install dependencies
+  package:
+    name: "{{ item }}"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: present
+  with_items:
+    - ansible
+    - git
+
+- name: add semaphore user
+  user:
+    name: "{{ semaphore_user }}"
+    createhome: false
+
+- name: create application directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ semaphore_user }}"
+    group: "root"
+    mode: "0755"
+  with_items:
+    - "{{ semaphore_path }}"
+    - "{{ semaphore_config_path | dirname }}"
+    - "{{ semaphore_tmp_path }}"
+
+- name: download latest release
+  get_url:
+    url: "{{ semaphore_download_url }}"
+    sha256sum: "{{ semaphore_download_sha256 | default(omit) }}"
+    dest: "{{ semaphore_executable_version }}"
+    owner: "{{ semaphore_user }}"
+    mode: "0755"
+
+- name: create current symlink
+  file:
+    src: "{{ semaphore_executable_version }}"
+    dest: "{{ semaphore_executable }}"
+    owner: "{{ semaphore_user }}"
+    mode: "0755"
+    state: "link"
+  notify:
+    - semaphore restart
+
+- name: read previous config
+  slurp:
+    src: "{{ semaphore_config_path }}"
+  register: semaphore_previous_config
+  ignore_errors: yes
+  failed_when: false
+
+- name: generate base config
+  command: "{{ semaphore_executable }} -printConfig"
+  register: semaphore_generated_config
+  when: semaphore_previous_config.content is not defined
+
+- name: choose between previous and base config
+  set_fact:
+    # would be better readable as multiline but the whitespace converts the object to string
+    semaphore_config_base: "{% if semaphore_previous_config.content is defined %}{{ semaphore_previous_config.content | b64decode | from_json }}{% else %}{{ semaphore_generated_config.stdout | from_json }}{% endif %}"
+
+- name: create config file
+  copy:
+    content: "{{ semaphore_config_base | combine(semaphore_config_object) | to_nice_json }}"
+    dest: "{{ semaphore_config_path }}"
+  notify:
+    - semaphore restart
+
+- name: setup db migrations
+  command: "{{ semaphore_executable }} -migrate -config {{ semaphore_config_path }}"
+  register: semaphore_migrations
+  changed_when: "'Executing migration' in semaphore_migrations"
+  notify:
+    - semaphore restart
+
+- name: check user table
+  command: "{{ semaphore_mysql_command_line }} {{ semaphore_mysql_command_user_count | quote }}"
+  register: semaphore_user_count
+  changed_when: false
+
+- name: generate password hash
+  command: "{{ semaphore_executable }} -hash {{ semaphore_default_user_password }}"
+  register: semaphore_default_user_hash
+  when: semaphore_user_count.stdout == "0"
+
+- name: clean password hash
+  set_fact:
+    semaphore_default_user_hash: "{{ semaphore_default_user_hash.stdout | replace('Generated password:', '') | trim }}"
+  when: semaphore_user_count.stdout == "0"
+
+- name: create default user
+  command: "{{ semaphore_mysql_command_line }} {{ semaphore_mysql_command_user_create | quote }}"
+  when: semaphore_user_count.stdout == "0"
+  changed_when: true
+
+- name: deploy systemd service file
+  template:
+    src: "systemd.service.j2"
+    dest: "{{ semaphore_systemd_unit_path }}"
+  notify:
+    - semaphore restart
+
+- name: service start
+  service:
+    name: "{{ semaphore_identifier }}"
+    state: "started"
+    enabled: "yes"

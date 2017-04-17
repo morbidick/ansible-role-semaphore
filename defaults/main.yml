@@ -1,0 +1,59 @@
+---
+# whether to install mysql on the host and the root password to set
+mysql_root_password: "root"
+semaphore_mysql_install: true
+
+# whether to create the mysql db and user
+semaphore_mysql_create_db: true
+
+# database options
+semaphore_mysql_host: "127.0.0.1"
+semaphore_mysql_port: "3000"
+semaphore_mysql_db: "semaphore"
+semaphore_mysql_user: "semaphore"
+semaphore_mysql_password: "semaphore"
+
+# the default user that should be created
+semaphore_default_user: "admin"
+semaphore_default_user_name: "{{ semaphore_default_user }}"
+semaphore_default_user_password: "admin"
+semaphore_default_user_mail: "admin@example.com"
+
+# sempahore binary source
+semaphore_version: "v2.2.0"
+semaphore_download_url: "https://github.com/ansible-semaphore/semaphore/releases/download/{{ semaphore_version }}/semaphore_linux_amd64"
+semaphore_download_sha256: "4b867b4af2db9ae11a7ea2b7dd87e158cbb57933620d31d96518311c44b50caa"
+
+# binary paths and service identifiers
+semaphore_user: "semaphore"
+semaphore_path: "/opt/semaphore"
+semaphore_config_path: "/etc/semaphore/semaphore.json"
+semaphore_tmp_path: "{{ semaphore_path }}/tmp"
+semaphore_executable: "{{ semaphore_path }}/semaphore"
+semaphore_executable_version: "{{ semaphore_executable }}_{{ semaphore_version }}"
+semaphore_identifier: "{{ semaphore_user }}"
+semaphore_systemd_unit_path: "/etc/systemd/system/{{ semaphore_identifier }}.service"
+
+# semaphore config options
+semaphore_environment: "release"
+semaphore_port: 3000
+semaphore_bugsnag_key: ""
+
+# mysql command lines to create default user
+semaphore_mysql_datetime: "{{ ansible_date_time.iso8601 | replace('T',' ') | replace('Z','') }}"
+semaphore_mysql_command_line: "mysql -u {{ semaphore_mysql_user }} -p{{ semaphore_mysql_password }} -h {{ semaphore_mysql_host }} {{ semaphore_mysql_db }} --batch --skip-column-names -e"
+semaphore_mysql_command_user_create: |
+  INSERT INTO user (created, username, name, email, password)
+  VALUES ("{{ semaphore_mysql_datetime }}", "{{ semaphore_default_user }}", "{{ semaphore_default_user_name }}", "{{ semaphore_default_user_mail }}", "{{ semaphore_default_user_hash }}");
+semaphore_mysql_command_user_count: "select count(*) from user;"
+
+# temporary object merge the previoes giten options with the generated ones
+semaphore_config_object:
+  mysql:
+    host: "{{ semaphore_mysql_host }}:{{ semaphore_mysql_port }}"
+    user: "{{ semaphore_mysql_user }}"
+    pass: "{{ semaphore_mysql_password }}"
+    name: "{{ semaphore_mysql_db }}"
+  port: ":{{ semaphore_port }}"
+  bugsnag_key: "{{ semaphore_bugsnag_key }}"
+  tmp_path: "{{ semaphore_tmp_path }}"

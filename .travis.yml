@@ -1,0 +1,29 @@
+---
+dist: trusty
+sudo: required
+language: python
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install python-pip -qq
+
+install:
+  # Install Ansible
+  - pip install ansible
+
+script:
+  # Basic role syntax check
+  - ansible-playbook tests/role.yml --syntax-check
+
+  # Run the role/playbook with ansible-playbook.
+  - ansible-playbook -i "localhost," tests/role.yml --connection="local" --become
+
+  # Run the role/playbook again, checking to make sure it's idempotent.
+  - >
+    ansible-playbook -i "localhost," tests/role.yml --connection=local --become
+    | grep -q 'changed=0.*failed=0'
+    && (echo 'Idempotence test: pass' && exit 0)
+    || (echo 'Idempotence test: fail' && exit 1)
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/

@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  author: morbidick
+  description: install and configure the Ansible UI Semaphore
+  license: MIT
+  min_ansible_version: 2.2
+
+  platforms:
+  - name: Debian
+    versions:
+    - all
+  - name: Ubuntu
+    versions:
+    - all
+
+  categories:
+  - automation
+  - ansible
+  - web
+
+dependencies: []

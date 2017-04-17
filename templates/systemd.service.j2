@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+
+[Service]
+WorkingDirectory={{ semaphore_path }}
+ExecStart={{ semaphore_executable }} -config {{ semaphore_config_path }}
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier={{ semaphore_identifier }}
+User={{ semaphore_user }}
+Group={{ semaphore_user }}
+Environment=GIN_MODE={{ semaphore_environment }}
+
+[Install]
+WantedBy=multi-user.target

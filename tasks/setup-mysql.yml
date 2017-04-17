@@ -1,0 +1,57 @@
+---
+- name: install MySQL
+  package:
+    name: "{{ item }}"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: present
+  with_items:
+    - python3-mysqldb
+    - mysql-server
+  register: mysql_install
+  when: semaphore_mysql_install
+
+- name: start the MySQL service
+  service:
+    name: mysql
+    state: started
+    enabled: true
+  when: semaphore_mysql_install
+
+- name: update mysql root password for all root accounts
+  mysql_user:
+    name: root
+    host: "{{ item }}"
+    password: "{{ mysql_root_password }}"
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    check_implicit_admin: yes
+    priv: "*.*:ALL,GRANT"
+  with_items:
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - ::1
+    - localhost
+  when: mysql_install.changed
+
+- name: setup semaphore database
+  mysql_db:
+    name: "{{ semaphore_mysql_db }}"
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_host: "{{ semaphore_mysql_host }}"
+    login_port: "{{ semaphore_mysql_port }}"
+  when: semaphore_mysql_create_db
+
+- name: setup semaphore database user
+  mysql_user:
+    name: "{{ semaphore_mysql_user }}"
+    host: "localhost"
+    password: "{{ semaphore_mysql_password }}"
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_host: "{{ semaphore_mysql_host }}"
+    login_port: "{{ semaphore_mysql_port }}"
+    priv: "{{ semaphore_mysql_db }}.*:ALL,GRANT"
+  when: semaphore_mysql_create_db
