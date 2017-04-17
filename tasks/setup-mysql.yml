@@ -6,7 +6,7 @@
     cache_valid_time: 3600
     state: present
   with_items:
-    - python3-mysqldb
+    - "{{ semaphore_python_mysql_module }}"
     - mysql-server
   register: mysql_install
   when: semaphore_mysql_install
