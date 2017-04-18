@@ -2,11 +2,11 @@
 
 [![Build Status](https://travis-ci.org/morbidick/ansible-role-semaphore.svg?branch=master)](https://travis-ci.org/morbidick/ansible-role-semaphore)
 
-Ansible role to install and configure the Ansible UI Semaphore.
+Ansible role to install and configure the [Ansible UI Semaphore](https://github.com/ansible-semaphore/semaphore).
 
 ## Requirements
 
-None. But for an production environment you should install a webserver as proxy for ssl termination.
+None. But for a production environment you should install a webserver as proxy for ssl termination.
 
 ## Example playbook
 
@@ -36,7 +36,7 @@ None of the variables below are required.
 | `semaphore_path`         | /opt/semaphore | destination for the binary |
 | `semaphore_config_path`  | /etc/semaphore/semaphore.json | config file |
 | `semaphore_default_user` | admin | login name of the default user |
-| `semaphore_default_user_name` | `{{ semaphore_default_user }}` | his human readable name |
+| `semaphore_default_user_name` | `semaphore_default_user` | his human readable name |
 | `semaphore_default_user_password` | admin | the password |
 | `semaphore_default_user_mail` | admin@example.com | and mail adress |
 
