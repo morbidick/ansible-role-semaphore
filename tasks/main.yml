@@ -78,7 +78,7 @@
 - name: setup db migrations
   command: "{{ semaphore_executable }} -migrate -config {{ semaphore_config_path }}"
   register: semaphore_migrations
-  changed_when: "'Executing migration' in semaphore_migrations"
+  changed_when: "'Executing migration' in semaphore_migrations.stdout"
   notify:
     - semaphore restart
 
