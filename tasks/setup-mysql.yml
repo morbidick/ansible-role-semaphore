@@ -8,6 +8,14 @@
   register: mysql_install
   when: semaphore_mysql_install
 
+- name: install Python MySQL module
+  package:
+    name: "{{ semaphore_python_mysql_module }}"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: present
+  when: semaphore_mysql_install or semaphore_mysql_create_db
+
 - name: start the MySQL service
   service:
     name: mysql
@@ -30,14 +38,6 @@
     - ::1
     - localhost
   when: mysql_install.changed
-
-- name: install Python MySQL module
-  package:
-    name: "{{ semaphore_python_mysql_module }}"
-    update_cache: yes
-    cache_valid_time: 3600
-    state: present
-  when: semaphore_mysql_create_db
 
 - name: setup semaphore database
   mysql_db:
