@@ -48,7 +48,7 @@ semaphore_mysql_command_user_create: |
   VALUES ("{{ semaphore_mysql_datetime }}", "{{ semaphore_default_user }}", "{{ semaphore_default_user_name }}", "{{ semaphore_default_user_mail }}", "{{ semaphore_default_user_hash }}");
 semaphore_mysql_command_user_count: "select count(*) from user;"
 
-# temporary object merge the previoes giten options with the generated ones
+# temporary object to merge the previous given options with the generated ones
 semaphore_config_object:
   mysql:
     host: "{{ semaphore_mysql_host }}:{{ semaphore_mysql_port }}"
