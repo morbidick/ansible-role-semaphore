@@ -42,7 +42,7 @@ semaphore_bugsnag_key: ""
 # mysql command lines to create default user
 semaphore_python_mysql_module: "{% if ansible_python_interpreter is defined and ansible_python_interpreter == '/usr/bin/python3' %}python3-mysqldb{% else %}python-mysqldb{% endif %}"
 semaphore_mysql_datetime: "{{ ansible_date_time.iso8601 | replace('T',' ') | replace('Z','') }}"
-semaphore_mysql_command_line: "mysql -u {{ semaphore_mysql_user }} -p{{ semaphore_mysql_password }} -h {{ semaphore_mysql_host }} {{ semaphore_mysql_db }} --batch --skip-column-names -e"
+semaphore_mysql_command_line: "mysql -u {{ semaphore_mysql_user | quote }} -p{{ semaphore_mysql_password | quote }} -h {{ semaphore_mysql_host | quote }} {{ semaphore_mysql_db | quote }} --batch --skip-column-names -e"
 semaphore_mysql_command_user_create: |
   INSERT INTO user (created, username, name, email, password)
   VALUES ("{{ semaphore_mysql_datetime }}", "{{ semaphore_default_user }}", "{{ semaphore_default_user_name }}", "{{ semaphore_default_user_mail }}", "{{ semaphore_default_user_hash }}");

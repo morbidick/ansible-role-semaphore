@@ -59,7 +59,7 @@
   failed_when: false
 
 - name: generate base config
-  command: "{{ semaphore_executable }} -printConfig"
+  command: "{{ semaphore_executable | quote }} -printConfig"
   register: semaphore_generated_config
   when: semaphore_previous_config.content is not defined
 
@@ -76,7 +76,7 @@
     - semaphore restart
 
 - name: setup db migrations
-  command: "{{ semaphore_executable }} -migrate -config {{ semaphore_config_path }}"
+  command: "{{ semaphore_executable | quote }} -migrate -config {{ semaphore_config_path | quote }}"
   register: semaphore_migrations
   changed_when: "'Executing migration' in semaphore_migrations.stdout"
   notify:
@@ -88,7 +88,7 @@
   changed_when: false
 
 - name: generate password hash
-  command: "{{ semaphore_executable }} -hash {{ semaphore_default_user_password }}"
+  command: "{{ semaphore_executable | quote }} -hash {{ semaphore_default_user_password | quote }}"
   register: semaphore_default_user_hash
   when: semaphore_user_count.stdout == "0"
 
