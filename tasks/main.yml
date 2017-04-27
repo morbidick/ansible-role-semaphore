@@ -70,7 +70,7 @@
 
 - name: create config file
   copy:
-    content: "{{ semaphore_config_base | combine(semaphore_config_object) | to_nice_json }}"
+    content: "{{ semaphore_config_base | combine(semaphore_config_object) | combine(semaphore_addn_config) | to_nice_json }}"
     dest: "{{ semaphore_config_path }}"
   notify:
     - semaphore restart

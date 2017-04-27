@@ -16,6 +16,11 @@ None. But for a production environment you should install a webserver as proxy f
 
   roles:
   - semaphore
+
+  vars:
+    semaphore_addn_config:
+      email_alert: true
+      email_sender: "semaphore@example.com"
 ````
 
 ## Role variables
@@ -34,6 +39,7 @@ None of the variables below are required.
 | `semaphore_user`         | semaphore | the user and systemd identifier semaphore runs as |
 | `semaphore_port`         | `3000`    | the port semaphore binds to |
 | `semaphore_path`         | /opt/semaphore | destination for the binary |
+| `semaphore_addn_config`  | `{}`      | for all options see the [source](https://github.com/ansible-semaphore/semaphore/blob/master/util/config.go#L36-L72) |
 | `semaphore_config_path`  | /etc/semaphore/semaphore.json | config file |
 | `semaphore_default_user` | admin | login name of the default user |
 | `semaphore_default_user_name` | `semaphore_default_user` | his human readable name |
