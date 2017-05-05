@@ -53,7 +53,7 @@ For all options see [defaults/main.yml](defaults/main.yml)
 You can use the [Vagrantfile](Vagrantfile) for local testing, just install vagrant and virtualbox.
 
 * run `vagrant up`
-* open your browser at [127.0.0.1:5000](http://127.0.0.1:5000)
+* open your browser at [127.0.0.1:3000](http://127.0.0.1:3000)
 * and login with user and password `admin`.
 
 ````bash
