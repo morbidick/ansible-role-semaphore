@@ -23,6 +23,10 @@ None. But for a production environment you should install a webserver as proxy f
       email_sender: "semaphore@example.com"
 ````
 
+### Using an existing database/mariadb
+
+Just set `semaphore_mysql_install: false` and provide the credentials `semaphore_mysql_*`.
+
 ## Role variables
 
 None of the variables below are required.
