@@ -33,7 +33,7 @@ None of the variables below are required.
 
 | Variable                 | Default   | Comment |
 | :---                     | :---      | :---    |
-| `semaphore_version`      | `v2.3.0`  | the version to download, also see `semaphore_download_url` and `semaphore_download_sha256` |
+| `semaphore_version`      | `v2.4.0`  | the version to download, also see `semaphore_download_url` and `semaphore_download_sha256` |
 | `semaphore_mysql_install` | `true`   | whether to install mysql on the host, installs with the password `mysql_root_password` |
 | `semaphore_mysql_create_db` | `true` | whether to create the mysql db and user |
 | `semaphore_mysql_host`:`semaphore_mysql_port` | `127.0.0.1`:`3306` | the mysql host |

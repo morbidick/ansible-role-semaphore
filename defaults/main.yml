@@ -20,9 +20,9 @@ semaphore_default_user_password: "admin"
 semaphore_default_user_mail: "admin@example.com"
 
 # sempahore binary source
-semaphore_version: "v2.3.0"
+semaphore_version: "v2.4.0"
 semaphore_download_url: "https://github.com/ansible-semaphore/semaphore/releases/download/{{ semaphore_version }}/semaphore_linux_amd64"
-semaphore_download_sha256: "a3677c7cba1b813629ff5da67792027b5001069ccb58ef1672e97380e3aadb77"
+semaphore_download_sha256: "e540b836fd2cd62416753a34a380d1d93595ce71b9b090a8c4c6cd865e75d978"
 
 # binary paths and service identifiers
 semaphore_user: "semaphore"
