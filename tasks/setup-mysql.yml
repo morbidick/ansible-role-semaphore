@@ -1,4 +1,10 @@
 ---
+- name: install MySQL-Client
+  package:
+    name: "mysql"
+    update_cache: yes
+    state: present
+    
 - name: install MySQL-Server
   package:
     name: "mysql-server"
