@@ -3,7 +3,6 @@
   package:
     name: "mysql-server"
     update_cache: yes
-    cache_valid_time: 3600
     state: present
   register: mysql_install
   when: semaphore_mysql_install
@@ -12,7 +11,6 @@
   package:
     name: "{{ semaphore_python_mysql_module }}"
     update_cache: yes
-    cache_valid_time: 3600
     state: present
   when: semaphore_mysql_install or semaphore_mysql_create_db
 

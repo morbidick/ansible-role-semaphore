@@ -5,12 +5,12 @@
 - name: add ansible ppa
   apt_repository:
     repo: 'ppa:ansible/ansible'
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: install dependencies
   package:
     name: "{{ item }}"
     update_cache: yes
-    cache_valid_time: 3600
     state: present
   with_items:
     - ansible
