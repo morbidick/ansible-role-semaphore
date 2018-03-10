@@ -1,18 +1,22 @@
 ---
 - name: install MySQL-Server
   package:
-    name: "mysql-server"
+    name: "{{ semaphore_mysql_server_package }}"
     update_cache: yes
-    cache_valid_time: 3600
     state: present
   register: mysql_install
   when: semaphore_mysql_install
+
+- name: install MySQL-Client
+  package:
+    name: "{{ semaphore_mysql_client_package }}"
+    update_cache: yes
+    state: present
 
 - name: install Python MySQL module
   package:
     name: "{{ semaphore_python_mysql_module }}"
     update_cache: yes
-    cache_valid_time: 3600
     state: present
   when: semaphore_mysql_install or semaphore_mysql_create_db
 
@@ -52,7 +56,7 @@
 - name: setup semaphore database user
   mysql_user:
     name: "{{ semaphore_mysql_user }}"
-    host: "localhost"
+    host: "{{ semaphore_mysql_allowed_host }}"
     password: "{{ semaphore_mysql_password }}"
     login_user: root
     login_password: "{{ mysql_root_password }}"
