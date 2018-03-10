@@ -1,13 +1,13 @@
 ---
 - name: install MySQL-Client
   package:
-    name: "mysql"
+    name: "{{ semaphore_mysql_client_package }}"
     update_cache: yes
     state: present
     
 - name: install MySQL-Server
   package:
-    name: "mysql-server"
+    name: "{{ semaphore_mysql_server_package }}"
     update_cache: yes
     state: present
   register: mysql_install
@@ -56,7 +56,7 @@
 - name: setup semaphore database user
   mysql_user:
     name: "{{ semaphore_mysql_user }}"
-    host: "%"
+    host: "{{ semaphore_mysql_allowed_host }}"
     password: "{{ semaphore_mysql_password }}"
     login_user: root
     login_password: "{{ mysql_root_password }}"
