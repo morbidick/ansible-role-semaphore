@@ -50,7 +50,7 @@
 - name: setup semaphore database user
   mysql_user:
     name: "{{ semaphore_mysql_user }}"
-    host: "localhost"
+    host: "%"
     password: "{{ semaphore_mysql_password }}"
     login_user: root
     login_password: "{{ mysql_root_password }}"
