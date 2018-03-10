@@ -1,10 +1,4 @@
 ---
-- name: install MySQL-Client
-  package:
-    name: "{{ semaphore_mysql_client_package }}"
-    update_cache: yes
-    state: present
-    
 - name: install MySQL-Server
   package:
     name: "{{ semaphore_mysql_server_package }}"
@@ -12,6 +6,12 @@
     state: present
   register: mysql_install
   when: semaphore_mysql_install
+
+- name: install MySQL-Client
+  package:
+    name: "{{ semaphore_mysql_client_package }}"
+    update_cache: yes
+    state: present
 
 - name: install Python MySQL module
   package:
