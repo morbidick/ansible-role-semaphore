@@ -41,7 +41,7 @@ semaphore_port: 3000
 semaphore_addn_config: {}
 
 # mysql command lines to create default user
-semaphore_mysql_client_package: "{% if ansible_distribution == 'CentOS' or ansible_distribution == 'Redhat' %}mariadb{% elif ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' %}mysql{% endif %}"
+semaphore_mysql_client_package: "{% if ansible_distribution == 'CentOS' or ansible_distribution == 'Redhat' %}mariadb{% elif ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' %}mysql-client{% endif %}"
 semaphore_mysql_server_package: "{% if ansible_distribution == 'CentOS' or ansible_distribution == 'Redhat' %}mariadb-server{% elif ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' %}mysql-server%{% endif %}"
 semaphore_python_mysql_module: "{% if ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat' %}MySQL-python{% elif ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' %}{% if ansible_python_interpreter is defined and ansible_python_interpreter == '/usr/bin/python3' %}python3-mysqldb{% else %}python-mysqldb{% endif %}{% endif %}" 
 semaphore_mysql_datetime: "{{ ansible_date_time.iso8601 | replace('T',' ') | replace('Z','') }}"
