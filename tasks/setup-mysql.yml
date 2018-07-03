@@ -12,6 +12,7 @@
     name: "{{ semaphore_mysql_client_package }}"
     update_cache: yes
     state: present
+  when: semaphore_mysql_install
 
 - name: install Python MySQL module
   package:
