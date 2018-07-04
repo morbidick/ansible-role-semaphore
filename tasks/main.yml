@@ -32,18 +32,30 @@
     - "{{ semaphore_path }}"
     - "{{ semaphore_config_path | dirname }}"
     - "{{ semaphore_tmp_path }}"
+    - "{{ semaphore_version_dir }}"
 
 - name: download latest release
   get_url:
     url: "{{ semaphore_download_url }}"
     sha256sum: "{{ semaphore_download_sha256 | default(omit) }}"
-    dest: "{{ semaphore_executable_version }}"
+    dest: "{{ semaphore_version_dir }}.tar.gz"
     owner: "{{ semaphore_user }}"
-    mode: "0755"
+
+- name: extract latest release
+  unarchive:
+    src: "{{ semaphore_version_dir }}.tar.gz"
+    dest: "{{ semaphore_version_dir }}"
+    remote_src: yes
+    creates: "{{ semaphore_version_dir }}/semaphore"
+
+- name: remove release archive
+  file:
+    path: "{{ semaphore_version_dir }}.tar.gz"
+    state: absent
 
 - name: create current symlink
   file:
-    src: "{{ semaphore_executable_version }}"
+    src: "{{ semaphore_version_dir }}/semaphore"
     dest: "{{ semaphore_executable }}"
     owner: "{{ semaphore_user }}"
     mode: "0755"
