@@ -47,13 +47,13 @@
     dest: "{{ semaphore_version_dir }}"
     remote_src: yes
     creates: "{{ semaphore_version_dir }}/semaphore"
+    owner: "{{ semaphore_user }}"
+    group: "{{ semaphore_user }}"
 
 - name: create current symlink
   file:
     src: "{{ semaphore_version_dir }}/semaphore"
     dest: "{{ semaphore_executable }}"
-    owner: "{{ semaphore_user }}"
-    mode: "0755"
     state: "link"
   notify:
     - semaphore restart
