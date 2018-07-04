@@ -21,9 +21,9 @@ semaphore_default_user_password: "admin"
 semaphore_default_user_mail: "admin@example.com"
 
 # sempahore binary source
-semaphore_version: "v2.4.1"
-semaphore_download_url: "https://github.com/ansible-semaphore/semaphore/releases/download/{{ semaphore_version }}/semaphore_linux_amd64"
-semaphore_download_sha256: "633dddcb93314088e92eed68d88ec2098376216dbfd76e9b63c811a40c29dd76"
+semaphore_version: "2.5.1"
+semaphore_download_url: "https://github.com/ansible-semaphore/semaphore/releases/download/v{{ semaphore_version }}/semaphore_{{ semaphore_version }}_linux_amd64.tar.gz"
+semaphore_download_sha256: "72421ba417acd327556ad2b0334439e7287ee37b95d296d622722175c356cd97"
 
 # binary paths and service identifiers
 semaphore_user: "semaphore"
@@ -31,7 +31,7 @@ semaphore_path: "/opt/semaphore"
 semaphore_config_path: "/etc/semaphore/semaphore.json"
 semaphore_tmp_path: "{{ semaphore_path }}/tmp"
 semaphore_executable: "{{ semaphore_path }}/semaphore"
-semaphore_executable_version: "{{ semaphore_executable }}_{{ semaphore_version }}"
+semaphore_version_dir: "{{ semaphore_executable }}_{{ semaphore_version }}"
 semaphore_identifier: "{{ semaphore_user }}"
 semaphore_systemd_unit_path: "/etc/systemd/system/{{ semaphore_identifier }}.service"
 
