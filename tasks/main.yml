@@ -48,11 +48,6 @@
     remote_src: yes
     creates: "{{ semaphore_version_dir }}/semaphore"
 
-- name: remove release archive
-  file:
-    path: "{{ semaphore_version_dir }}.tar.gz"
-    state: absent
-
 - name: create current symlink
   file:
     src: "{{ semaphore_version_dir }}/semaphore"
