@@ -21,9 +21,9 @@ semaphore_default_user_password: "admin"
 semaphore_default_user_mail: "admin@example.com"
 
 # sempahore binary source
-semaphore_version: "2.5.1"
+semaphore_version: "2.8.77"
 semaphore_download_url: "https://github.com/ansible-semaphore/semaphore/releases/download/v{{ semaphore_version }}/semaphore_{{ semaphore_version }}_linux_amd64.tar.gz"
-semaphore_download_sha256: "72421ba417acd327556ad2b0334439e7287ee37b95d296d622722175c356cd97"
+semaphore_download_checksum: "sha256:a67a6ef4a49bf7613e87628bf35db7d239050a99d7123a278c6cc85b2bff7997"
 
 # binary paths and service identifiers
 semaphore_user: "semaphore"
@@ -31,25 +31,27 @@ semaphore_path: "/opt/semaphore"
 semaphore_config_path: "/etc/semaphore/semaphore.json"
 semaphore_tmp_path: "{{ semaphore_path }}/tmp"
 semaphore_executable: "{{ semaphore_path }}/semaphore"
+semaphore_command: "{{ semaphore_executable }} --config {{ semaphore_config_path | quote }}"
 semaphore_version_dir: "{{ semaphore_executable }}_{{ semaphore_version }}"
 semaphore_identifier: "{{ semaphore_user }}"
 semaphore_systemd_unit_path: "/etc/systemd/system/{{ semaphore_identifier }}.service"
 
 # semaphore config options
-semaphore_environment: "release"
 semaphore_port: 3000
 semaphore_addn_config: {}
 
 # mysql command lines to create default user
 semaphore_mysql_client_package: "{% if ansible_distribution == 'CentOS' or ansible_distribution == 'Redhat' %}mariadb{% elif ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' %}mysql-client{% endif %}"
 semaphore_mysql_server_package: "{% if ansible_distribution == 'CentOS' or ansible_distribution == 'Redhat' %}mariadb-server{% elif ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' %}mysql-server{% endif %}"
-semaphore_python_mysql_module: "{% if ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat' %}MySQL-python{% elif ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' %}{% if ansible_python_interpreter is defined and ansible_python_interpreter == '/usr/bin/python3' %}python3-mysqldb{% else %}python-mysqldb{% endif %}{% endif %}" 
-semaphore_mysql_datetime: "{{ ansible_date_time.iso8601 | replace('T',' ') | replace('Z','') }}"
-semaphore_mysql_command_line: "mysql -u {{ semaphore_mysql_user | quote }} -p{{ semaphore_mysql_password | quote }} -h {{ semaphore_mysql_host | quote }} {{ semaphore_mysql_db | quote }} --batch --skip-column-names -e"
-semaphore_mysql_command_user_create: |
-  INSERT INTO user (created, username, name, email, password)
-  VALUES ("{{ semaphore_mysql_datetime }}", "{{ semaphore_default_user }}", "{{ semaphore_default_user_name }}", "{{ semaphore_default_user_mail }}", "{{ semaphore_default_user_hash }}");
-semaphore_mysql_command_user_count: "select count(*) from user;"
+semaphore_mysql_service_name: "{% if ansible_distribution == 'CentOS' or ansible_distribution == 'Redhat' %}mariadb{% elif ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' %}mysql{% endif %}"
+semaphore_python_mysql_module: "{% if ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat' %}python3-PyMySQL{% elif ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' %}python3-mysqldb{% endif %}" 
+
+# generated secrets in case they dont exist yet
+semaphore_config_previous: {}
+semaphore_config_base_generated_secrets:
+  cookie_hash: "{{ lookup('password', '/dev/null length=32') | b64encode }}"
+  cookie_encryption: "{{ lookup('password', '/dev/null length=32') | b64encode }}"
+  access_key_encryption: "{{ lookup('password', '/dev/null length=32') | b64encode }}"
 
 # temporary object to merge the previous given options with the generated ones
 semaphore_config_object:

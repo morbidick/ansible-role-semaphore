@@ -1,5 +1,0 @@
-{
-  "semaphore_user": "travis",
-  "semaphore_mysql_install": false,
-  "mysql_root_password": ""
-}

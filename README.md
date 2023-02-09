@@ -1,7 +1,5 @@
 # Ansible UI Semaphore
 
-[![Build Status](https://travis-ci.org/morbidick/ansible-role-semaphore.svg?branch=master)](https://travis-ci.org/morbidick/ansible-role-semaphore)
-
 Ansible role to install and configure the [Ansible UI Semaphore](https://github.com/ansible-semaphore/semaphore).
 
 ## Requirements
@@ -33,7 +31,7 @@ None of the variables below are required.
 
 | Variable                 | Default   | Comment |
 | :---                     | :---      | :---    |
-| `semaphore_version`      | `v2.4.1`  | the version to download, also see `semaphore_download_url` and `semaphore_download_sha256` |
+| `semaphore_version`      | `v2.8.77`  | the version to download, also see `semaphore_download_url` and `semaphore_download_checksum` |
 | `semaphore_mysql_install` | `true`   | whether to install mysql on the host, installs with the password `mysql_root_password` |
 | `semaphore_mysql_create_db` | `true` | whether to create the mysql db and user |
 | `semaphore_mysql_host`:`semaphore_mysql_port` | `127.0.0.1`:`3306` | the mysql host |
@@ -54,18 +52,11 @@ For all options see [defaults/main.yml](defaults/main.yml)
 
 ## Demo/Development
 
-You can use the [Vagrantfile](Vagrantfile) for local testing, just install vagrant and virtualbox.
+Molecule is used for testing, the webinterface of the centos machine will be exposed and can be used as demo.
 
-* run `vagrant up`
+* run `molecule converge`
 * open your browser at [127.0.0.1:3000](http://127.0.0.1:3000)
 * and login with user and password `admin`.
-
-````bash
-# boot the vm
-vagrant up
-# reprovision
-vagrant provision
-````
 
 ## License
 

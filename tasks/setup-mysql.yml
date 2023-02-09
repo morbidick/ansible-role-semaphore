@@ -23,7 +23,7 @@
 
 - name: start the MySQL service
   service:
-    name: mysql
+    name: "{{ semaphore_mysql_service_name }}"
     state: started
     enabled: true
   when: semaphore_mysql_install
