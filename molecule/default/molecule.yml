@@ -1,0 +1,46 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: podman
+platforms:
+  - name: centos8
+    image: quay.io/centos/centos:stream8
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    capabilities:
+      - SYS_ADMIN
+      - CAP_NET_BIND_SERVICE
+    command: "/usr/sbin/init"
+    pre_build_image: true
+    published_ports:
+      - 127.0.0.1:3000:3000
+  - name: ubuntu2004
+    image: docker.io/geerlingguy/docker-ubuntu2004-ansible
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    capabilities:
+      - SYS_ADMIN
+    command: "/lib/systemd/systemd"
+    pre_build_image: true
+  - name: ubuntu2204
+    image: docker.io/geerlingguy/docker-ubuntu2004-ansible
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    capabilities:
+      - SYS_ADMIN
+    command: "/lib/systemd/systemd"
+    pre_build_image: true
+provisioner:
+  name: ansible
+verifier:
+  name: ansible

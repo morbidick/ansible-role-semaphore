@@ -1,11 +1,6 @@
 ---
-- include: setup-mysql.yml
+- import_tasks: setup-mysql.yml
   when: semaphore_mysql_install or semaphore_mysql_create_db
-
-- name: add ansible ppa
-  apt_repository:
-    repo: 'ppa:ansible/ansible'
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: install dependencies
   package:
@@ -13,8 +8,13 @@
     update_cache: yes
     state: present
   with_items:
-    - ansible
     - git
+    - python3-pip
+
+- name: install ansible
+  pip:
+    name: ansible
+    state: present
 
 - name: add semaphore user
   user:
@@ -37,7 +37,7 @@
 - name: download latest release
   get_url:
     url: "{{ semaphore_download_url }}"
-    sha256sum: "{{ semaphore_download_sha256 | default(omit) }}"
+    semaphore_download_checksum: "{{ semaphore_download_sha256 | default(omit) }}"
     dest: "{{ semaphore_version_dir }}.tar.gz"
     owner: "{{ semaphore_user }}"
 
@@ -61,52 +61,44 @@
 - name: read previous config
   slurp:
     src: "{{ semaphore_config_path }}"
-  register: semaphore_previous_config
+  register: semaphore_previous_config_content
   ignore_errors: yes
   failed_when: false
 
-- name: generate base config
-  command: "{{ semaphore_executable | quote }} -printConfig"
-  register: semaphore_generated_config
-  when: semaphore_previous_config.content is not defined
-
-- name: choose between previous and base config
+- name: parse previous config
   set_fact:
-    # would be better readable as multiline but the whitespace converts the object to string
-    semaphore_config_base: "{% if semaphore_previous_config.content is defined %}{{ semaphore_previous_config.content | b64decode | from_json }}{% else %}{{ semaphore_generated_config.stdout | from_json }}{% endif %}"
+    semaphore_config_previous: "{{ semaphore_previous_config_content.content| b64decode |from_json }}"
+  when: semaphore_previous_config_content.content is defined
+
+- name: ensure secrets in config
+  set_fact:
+    semaphore_config_previous_with_secrets:
+      cookie_hash: "{{ semaphore_config_previous.cookie_hash | default(semaphore_config_base_generated_secrets.cookie_hash) }}"
+      cookie_encryption: "{{ semaphore_config_previous.cookie_encryption | default(semaphore_config_base_generated_secrets.cookie_encryption) }}"
+      access_key_encryption: "{{ semaphore_config_previous.access_key_encryption | default(semaphore_config_base_generated_secrets.access_key_encryption) }}"
 
 - name: create config file
   copy:
-    content: "{{ semaphore_config_base | combine(semaphore_config_object) | combine(semaphore_addn_config) | to_nice_json }}"
+    content: "{{ semaphore_config_previous_with_secrets | combine(semaphore_config_object) | combine(semaphore_addn_config) | to_nice_json }}"
     dest: "{{ semaphore_config_path }}"
   notify:
     - semaphore restart
 
 - name: setup db migrations
-  command: "{{ semaphore_executable | quote }} -migrate -config {{ semaphore_config_path | quote }}"
+  command: "{{ semaphore_command }} migrate"
   register: semaphore_migrations
   changed_when: "'Executing migration' in semaphore_migrations.stdout"
   notify:
     - semaphore restart
 
-- name: check user table
-  command: "{{ semaphore_mysql_command_line }} {{ semaphore_mysql_command_user_count | quote }}"
-  register: semaphore_user_count
+- name: check users
+  command: "{{ semaphore_command }} user list"
+  register: semaphore_users
   changed_when: false
 
-- name: generate password hash
-  command: "{{ semaphore_executable | quote }} -hash {{ semaphore_default_user_password | quote }}"
-  register: semaphore_default_user_hash
-  when: semaphore_user_count.stdout == "0"
-
-- name: clean password hash
-  set_fact:
-    semaphore_default_user_hash: "{{ semaphore_default_user_hash.stdout | replace('Generated password:', '') | trim }}"
-  when: semaphore_user_count.stdout == "0"
-
 - name: create default user
-  command: "{{ semaphore_mysql_command_line }} {{ semaphore_mysql_command_user_create | quote }}"
-  when: semaphore_user_count.stdout == "0"
+  command: "{{ semaphore_command }} user add --name {{ semaphore_default_user_name | quote }} --login {{ semaphore_default_user | quote }} --email {{ semaphore_default_user_mail | quote }} --password {{ semaphore_default_user_password | quote }}"
+  when: semaphore_users.stdout == ""
   changed_when: true
 
 - name: deploy systemd service file

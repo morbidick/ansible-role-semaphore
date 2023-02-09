@@ -1,6 +1,7 @@
 ---
 galaxy_info:
   author: morbidick
+  role_name: semaphore
   description: install and configure the Ansible UI Semaphore
   license: MIT
   min_ansible_version: 2.2
