@@ -2,7 +2,7 @@
 name: Test
 
 on:
-  push: [push, fork]
+  push: [push, fork, pull_request]
 
 jobs:
   molecule:
