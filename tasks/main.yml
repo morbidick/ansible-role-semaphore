@@ -1,115 +1,119 @@
 ---
-- import_tasks: setup-mysql.yml
+- name: Ensure MySQL Server
+  ansible.builtin.import_tasks: setup-mysql.yml
   when: semaphore_mysql_install or semaphore_mysql_create_db
 
-- name: install dependencies
-  package:
+- name: Install dependencies
+  ansible.builtin.package:
     name: "{{ item }}"
-    update_cache: yes
+    update_cache: true
     state: present
   with_items:
     - git
     - python3-pip
 
-- name: install ansible
-  pip:
+- name: Install ansible
+  ansible.builtin.pip:
     name: ansible
     state: present
 
-- name: add semaphore user
-  user:
+- name: Add semaphore user
+  ansible.builtin.user:
     name: "{{ semaphore_user }}"
     createhome: false
 
-- name: create application directories
-  file:
+- name: Create application directories
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: "{{ semaphore_user }}"
-    group: "root"
-    mode: "0755"
+    group: "{{ semaphore_user }}"
+    mode: 0755
   with_items:
     - "{{ semaphore_path }}"
     - "{{ semaphore_config_path | dirname }}"
     - "{{ semaphore_tmp_path }}"
     - "{{ semaphore_version_dir }}"
 
-- name: download latest release
-  get_url:
+- name: Download latest release
+  ansible.builtin.get_url:
     url: "{{ semaphore_download_url }}"
-    semaphore_download_checksum: "{{ semaphore_download_sha256 | default(omit) }}"
+    checksum: "{{ semaphore_download_checksum | default(omit) }}"
     dest: "{{ semaphore_version_dir }}.tar.gz"
     owner: "{{ semaphore_user }}"
+    mode: 0644
 
-- name: extract latest release
-  unarchive:
+- name: Extract latest release
+  ansible.builtin.unarchive:
     src: "{{ semaphore_version_dir }}.tar.gz"
     dest: "{{ semaphore_version_dir }}"
-    remote_src: yes
+    remote_src: true
     creates: "{{ semaphore_version_dir }}/semaphore"
     owner: "{{ semaphore_user }}"
     group: "{{ semaphore_user }}"
 
-- name: create current symlink
-  file:
+- name: Create current symlink
+  ansible.builtin.file:
     src: "{{ semaphore_version_dir }}/semaphore"
     dest: "{{ semaphore_executable }}"
     state: "link"
   notify:
     - semaphore restart
 
-- name: read previous config
-  slurp:
+- name: Read previous config
+  ansible.builtin.slurp:
     src: "{{ semaphore_config_path }}"
   register: semaphore_previous_config_content
-  ignore_errors: yes
+  ignore_errors: true
   failed_when: false
 
-- name: parse previous config
-  set_fact:
-    semaphore_config_previous: "{{ semaphore_previous_config_content.content| b64decode |from_json }}"
+- name: Parse previous config
+  ansible.builtin.set_fact:
+    semaphore_config_previous: "{{ semaphore_previous_config_content.content | b64decode | from_json }}"
   when: semaphore_previous_config_content.content is defined
 
-- name: ensure secrets in config
-  set_fact:
+- name: Ensure secrets in config
+  ansible.builtin.set_fact:
     semaphore_config_previous_with_secrets:
       cookie_hash: "{{ semaphore_config_previous.cookie_hash | default(semaphore_config_base_generated_secrets.cookie_hash) }}"
       cookie_encryption: "{{ semaphore_config_previous.cookie_encryption | default(semaphore_config_base_generated_secrets.cookie_encryption) }}"
       access_key_encryption: "{{ semaphore_config_previous.access_key_encryption | default(semaphore_config_base_generated_secrets.access_key_encryption) }}"
 
-- name: create config file
-  copy:
+- name: Create config file
+  ansible.builtin.copy:
     content: "{{ semaphore_config_previous_with_secrets | combine(semaphore_config_object) | combine(semaphore_addn_config) | to_nice_json }}"
     dest: "{{ semaphore_config_path }}"
+    mode: 0644
   notify:
     - semaphore restart
 
-- name: setup db migrations
-  command: "{{ semaphore_command }} migrate"
+- name: Setup db migrations
+  ansible.builtin.command: "{{ semaphore_command }} migrate"
   register: semaphore_migrations
   changed_when: "'Executing migration' in semaphore_migrations.stdout"
   notify:
     - semaphore restart
 
-- name: check users
-  command: "{{ semaphore_command }} user list"
+- name: Check users
+  ansible.builtin.command: "{{ semaphore_command }} user list"
   register: semaphore_users
   changed_when: false
 
-- name: create default user
-  command: "{{ semaphore_command }} user add --name {{ semaphore_default_user_name | quote }} --login {{ semaphore_default_user | quote }} --email {{ semaphore_default_user_mail | quote }} --password {{ semaphore_default_user_password | quote }}"
+- name: Create default user
+  ansible.builtin.command: "{{ semaphore_command }} user add --name {{ semaphore_default_user_name | quote }} --login {{ semaphore_default_user | quote }} --email {{ semaphore_default_user_mail | quote }} --password {{ semaphore_default_user_password | quote }}"
   when: semaphore_users.stdout == ""
   changed_when: true
 
-- name: deploy systemd service file
-  template:
+- name: Deploy systemd service file
+  ansible.builtin.template:
     src: "systemd.service.j2"
     dest: "{{ semaphore_systemd_unit_path }}"
+    mode: 0644
   notify:
     - semaphore restart
 
-- name: service start
-  service:
+- name: Service start
+  ansible.builtin.systemd:
     name: "{{ semaphore_identifier }}"
     state: "started"
-    enabled: "yes"
+    enabled: true
