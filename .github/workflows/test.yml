@@ -1,3 +1,4 @@
+---
 name: Test
 
 on:
@@ -28,3 +29,5 @@ jobs:
 
       - name: Run molecule
         run: "molecule test"
+        env:
+          ANSIBLE_FORCE_COLOR: '1'

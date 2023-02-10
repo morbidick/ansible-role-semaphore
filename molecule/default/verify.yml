@@ -8,6 +8,6 @@
     - name: Ensure Semaphore service is runnning
       ansible.builtin.uri:
         url: http://localhost:3000
-        return_content: yes
+        return_content: true
       register: this
       failed_when: "'<title>Ansible Semaphore</title>' not in this.content"
