@@ -21,6 +21,5 @@ jobs:
         uses: gofrolist/molecule-action@v2
         with:
           molecule_command: test
-          molecule_args: -d docker
         env:
           ANSIBLE_FORCE_COLOR: '1'
