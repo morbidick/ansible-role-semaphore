@@ -1,6 +1,6 @@
 ---
-- name: semaphore restart
-  service:
+- name: Semaphore restart
+  ansible.builtin.systemd:
     name: "{{ semaphore_identifier }}"
     daemon_reload: true
     state: restarted

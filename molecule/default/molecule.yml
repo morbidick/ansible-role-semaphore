@@ -44,3 +44,7 @@ provisioner:
   name: ansible
 verifier:
   name: ansible
+lint: |
+  set -e
+  yamllint -c .yamllint.yml .
+  ansible-lint .
