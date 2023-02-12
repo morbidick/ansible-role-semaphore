@@ -58,7 +58,7 @@
     dest: "{{ semaphore_executable }}"
     state: "link"
   notify:
-    - semaphore restart
+    - Semaphore restart
 
 - name: Read previous config
   ansible.builtin.slurp:
@@ -85,14 +85,14 @@
     dest: "{{ semaphore_config_path }}"
     mode: 0644
   notify:
-    - semaphore restart
+    - Semaphore restart
 
 - name: Setup db migrations
   ansible.builtin.command: "{{ semaphore_command }} migrate"
   register: semaphore_migrations
   changed_when: "'Executing migration' in semaphore_migrations.stdout"
   notify:
-    - semaphore restart
+    - Semaphore restart
 
 - name: Check users
   ansible.builtin.command: "{{ semaphore_command }} user list"
@@ -110,7 +110,7 @@
     dest: "{{ semaphore_systemd_unit_path }}"
     mode: 0644
   notify:
-    - semaphore restart
+    - Semaphore restart
 
 - name: Service start
   ansible.builtin.systemd:
