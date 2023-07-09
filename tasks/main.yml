@@ -100,7 +100,7 @@
   changed_when: false
 
 - name: Create default user
-  ansible.builtin.command: "{{ semaphore_command }} user add --name {{ semaphore_default_user_name | quote }} --login {{ semaphore_default_user | quote }} --email {{ semaphore_default_user_mail | quote }} --password {{ semaphore_default_user_password | quote }}"
+  ansible.builtin.command: "{{ semaphore_command }} user add --admin --name {{ semaphore_default_user_name | quote }} --login {{ semaphore_default_user | quote }} --email {{ semaphore_default_user_mail | quote }} --password {{ semaphore_default_user_password | quote }}"
   when: semaphore_users.stdout == ""
   changed_when: true
 
